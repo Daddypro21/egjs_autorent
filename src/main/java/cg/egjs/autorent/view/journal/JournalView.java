@@ -93,8 +93,32 @@ public class JournalView {
 
         // Bouton export
         Button exportBtn = UIFactory.btnSecondary("📄 Exporter");
-        exportBtn.setOnAction(e -> UIFactory.showError(dashboard.getStage(),
-            "Export journal généré dans : exports/journal_" + java.time.LocalDate.now() + ".csv"));
+        exportBtn.setOnAction(e -> {
+            try {
+                List<JournalAction> all = journalDAO.findRecent(1000);
+                java.io.File dir = new java.io.File("exports");
+                dir.mkdirs();
+                String fileName = "exports/journal_" + java.time.LocalDate.now() + ".csv";
+                try (java.io.PrintWriter pw = new java.io.PrintWriter(
+                        new java.io.OutputStreamWriter(
+                            new java.io.FileOutputStream(fileName), java.nio.charset.StandardCharsets.UTF_8))) {
+                    pw.println("ID;Action;Détails;Utilisateur;IP;Date/Heure");
+                    for (JournalAction j : all) {
+                        pw.printf("%d;%s;%s;%s;%s;%s%n",
+                            j.getIdLog(),
+                            j.getAction() != null ? j.getAction() : "",
+                            j.getDetails() != null ? j.getDetails().replace(";", ",") : "",
+                            j.getIdUtilisateur() != null ? "User #" + j.getIdUtilisateur() : "",
+                            j.getAdresseIP() != null ? j.getAdresseIP() : "",
+                            j.getDateHeure() != null ? j.getDateHeure().toString() : "");
+                    }
+                }
+                UIFactory.showSuccess(dashboard.getStage(),
+                    "Export généré : " + new java.io.File(fileName).getAbsolutePath());
+            } catch (Exception ex) {
+                UIFactory.showError(dashboard.getStage(), "Erreur export : " + ex.getMessage());
+            }
+        });
 
         Button appliquerBtn = UIFactory.btnPrimary("Appliquer");
         appliquerBtn.setOnAction(e -> {

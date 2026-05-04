@@ -381,6 +381,15 @@ public class UIFactory {
         alert.showAndWait();
     }
 
+    public static void showSuccess(Stage owner, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Succès — EGJS AutoRent");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initOwner(owner);
+        alert.showAndWait();
+    }
+
     public static boolean showConfirm(Stage owner, String title, String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
